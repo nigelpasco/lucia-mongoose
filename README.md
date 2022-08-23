@@ -1,6 +1,6 @@
 # lucia-mongoose
 
-This is a basic implementation of sveltekit@next with [`lucia-sveltekit`](https://https://github.com/pilcrowOnPaper/lucia-sveltekit) by pilcrowOnPaper.
+This is a basic implementation of sveltekit@next with [`lucia-sveltekit`](https://https://github.com/pilcrowOnPaper/lucia-sveltekit) by PilcrowOnPaper, and utilising the mongoose-adapter courtesy of SkepticMystic.
 
 ## Setting up project
 
