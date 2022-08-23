@@ -1,17 +1,27 @@
-# create-svelte
+# lucia-mongoose
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This is a basic implementation of sveltekit@next with [`lucia-sveltekit`](https://https://github.com/pilcrowOnPaper/lucia-sveltekit) by pilcrowOnPaper.
 
-## Creating a project
+## Setting up project
 
-If you're seeing this, you've probably already done this step. Congrats!
+You will need to install npm dependencies...
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
+# install npm dependencies (npm, pnpm, yarn etc.)
+pnpm install
+```
 
-# create a new project in my-app
-npm create svelte@latest my-app
+and add an .env file to the root directory...
+
+```bash
+# add .env file
+touch .env
+```
+which should at least have the following records for your mongoDB database:
+
+```bash
+API_SECRET=
+MONGODB_URI=
 ```
 
 ## Developing
@@ -34,5 +44,3 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
