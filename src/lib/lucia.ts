@@ -18,7 +18,9 @@ export const User = mongoose.model(
         unique: true,
         required: true,
       },
-      hashed_password: String
+      hashed_password: String,
+      email: String,
+      username: String
     },
     { _id: false }
   )

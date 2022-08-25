@@ -3,15 +3,25 @@
 	let email: string = '',
 		password: string = '';
 
-	const login = async (e: SubmitEvent) => {
-		const form = e.target as HTMLFormElement;
-		form.submit();
+	// const login = async (e: SubmitEvent) => {
+	// 	const form = e.target as HTMLFormElement;
+	// 	form.submit();
+	// };
+
+	const signup = async () => {
+		await fetch('/api/signup', {
+			method: 'POST',
+			body: JSON.stringify({
+				email,
+				password
+			})
+		});
 	};
 </script>
 
 <div>
-	<h1>Log In</h1>
-	<form on:submit|preventDefault={login} method="post">
+	<h1>Sign Up</h1>
+	<form on:submit|preventDefault={signup} method="post">
 		<div>
 			<label for="email"> Email address </label>
 			<div>
@@ -41,7 +51,7 @@
 		</div>
 
 		<div>
-			<button type="submit">Sign in</button>
+			<button type="submit">Sign Up</button>
 		</div>
 		<p>{errors?.message || ''}</p>
 	</form>
