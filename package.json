@@ -34,7 +34,7 @@
 	"dependencies": {
 		"@lucia-sveltekit/adapter-mongoose": "^0.1.1",
 		"env-cmd": "^10.1.0",
-		"lucia-sveltekit": "^0.7.1",
+		"lucia-sveltekit": "0.7.1",
 		"mongoose": "^6.5.3"
 	}
 }

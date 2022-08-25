@@ -9,6 +9,7 @@
 	let number = 0;
 
 	const lucia = getSession();
+	console.log($lucia);
 
 	const fetchNumber = async () => {
 		const response = await fetch('/api/random-number', {
