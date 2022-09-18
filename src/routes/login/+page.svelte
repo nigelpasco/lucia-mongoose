@@ -1,7 +1,6 @@
 <script lang="ts">
 	export let errors: { message: string };
-	let email: string = '',
-		password: string = '';
+	let email: string, password: string;
 
 	const login = async (e: SubmitEvent) => {
 		const form = e.target as HTMLFormElement;
@@ -10,39 +9,14 @@
 </script>
 
 <div>
-	<h1>Log In</h1>
-	<form on:submit|preventDefault={login} method="post">
-		<div>
-			<label for="email"> Email address </label>
-			<div>
-				<input
-					id="email"
-					name="email"
-					bind:value={email}
-					type="email"
-					autocomplete="email"
-					required
-				/>
-			</div>
-		</div>
-
-		<div>
-			<label for="password"> Password </label>
-			<div>
-				<input
-					id="password"
-					name="password"
-					bind:value={password}
-					type="password"
-					autocomplete="current-password"
-					required
-				/>
-			</div>
-		</div>
-
-		<div>
-			<button type="submit">Sign in</button>
-		</div>
-		<p>{errors?.message || ''}</p>
+	<h2>Sign in</h2>
+	<form on:submit|preventDefault={login} action="/login" method="post">
+		<label for="email">email</label><br />
+		<input id="email" name="email" type="email" bind:value={email} /><br />
+		<label for="password">password</label><br />
+		<input type="password" id="password" name="password" bind:value={password} /><br />
+		<input type="submit" value="Continue" class="button" />
 	</form>
+	<p class="error">{errors?.message || ''}</p>
+	<a href="/signup" class="link">Create a new account</a>
 </div>

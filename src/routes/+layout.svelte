@@ -1,7 +1,10 @@
 <script>
-	import { Lucia } from 'lucia-sveltekit/client';
+	import { handleSilentRefresh } from 'lucia-sveltekit/client';
+	handleSilentRefresh();
 </script>
 
-<Lucia on:error={(e) => console.error(e)}>
-	<slot />
-</Lucia>
+<svelte:head>
+	<title>Sveltekit Lucia Mongoose demo</title>
+</svelte:head>
+
+<slot />

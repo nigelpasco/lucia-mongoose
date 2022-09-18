@@ -1,46 +1,53 @@
-import type { Action } from '@sveltejs/kit';
 import { auth } from '$lib/lucia';
+import type { Actions } from "@sveltejs/kit";
+import { setCookie } from 'lucia-sveltekit';
 
-export const POST: Action = async ({ request, setHeaders }) => {
-	const form = await request.formData();
-	const email = form.get('email');
-	const password = form.get('password');
-
-	if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
-		return {
-			errors: {
-				message: 'Invalid input'
-			}
-		};
-	}
-
-	try {
-		const authenticateUser = await auth.authenticateUser('userName', email, password);
-		setHeaders({
-			'set-cookie': authenticateUser.cookies
-		});
-		return {
-			location: '/profile'
-		};
-	} catch (e) {
-		console.log(e)
-		const error = e as Error;
-		if (
-			error.message === 'AUTH_INVALID_IDENTIFIER_TOKEN' ||
-			error.message === 'AUTH_INVALID_PASSWORD'
-		) {
+export const actions: Actions = {
+	default: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const email = form.get('email');
+		const password = form.get('password');
+		if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
 			return {
 				errors: {
-					message: 'Incorrect userName or password.'
+					message: 'Invalid input',
+					email: ''
 				}
 			};
 		}
-		// database connection error
-		return {
-			status: 500,
-			errors: {
-				message: 'Unknown error.'
+		try {
+			const createUser = await auth.createUser('email', email, {
+				password,
+				user_data: {
+					userName: email,
+					email
+				}
+			});
+			setCookie(cookies, ...createUser.cookies)
+			return {
+				location: "/profile"
 			}
-		};
+		} catch (e) {
+			const error = e as Error;
+			if (
+				error.message === 'AUTH_DUPLICATE_IDENTIFIER_TOKEN' ||
+				error.message === 'AUTH_DUPLICATE_USER_DATA'
+			) {
+				return {
+					errors: {
+						email: 'Email already taken',
+						message: ''
+					}
+				};
+			}
+			console.error(error)
+			return {
+				status: 500,
+				errors: {
+					message: 'Unknown error',
+					email: ''
+				}
+			};
+		}
 	}
-};
+}

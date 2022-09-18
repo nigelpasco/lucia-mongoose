@@ -1,7 +1,7 @@
 import lucia from "lucia-sveltekit";
 import adapter from '@lucia-sveltekit/adapter-mongoose';
 import mongoose from 'mongoose';
-import { dev } from '$app/env';
+import { dev } from '$app/environment';
 
 // Pull environment variables
 const url = process.env.MONGODB_URI ? process.env.MONGODB_URI : '';
@@ -20,7 +20,7 @@ export const User = mongoose.model(
       },
       hashed_password: String,
       email: String,
-      username: String
+      userName: String
     },
     { _id: false }
   )

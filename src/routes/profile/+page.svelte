@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { signOut, getSession } from 'lucia-sveltekit/client';
+	const session = getSession();
 
 	const signOutUser = async () => {
 		await signOut();
@@ -8,13 +9,10 @@
 
 	let number = 0;
 
-	const lucia = getSession();
-	console.log($lucia);
-
 	const fetchNumber = async () => {
 		const response = await fetch('/api/random-number', {
 			headers: {
-				Authorization: `Bearer ${$lucia?.access_token}`
+				Authorization: `Bearer ${$session?.access_token}`
 			}
 		});
 		const result = await response.json();
@@ -26,16 +24,16 @@
 	};
 </script>
 
-<h1>Hello world!</h1>
+<h2>Profile</h2>
 <p>This page is protected and can only be accessed by authenticated users.</p>
 <div>
-	<p>user id: {$lucia?.user.user_id}</p>
-	<p>userName: {$lucia?.user.userName}</p>
+	<p>user id: {$session?.user.user_id}</p>
+	<p>username: {$session?.user.userName}</p>
 </div>
 
 <div>
 	<form on:submit|preventDefault={fetchNumber} action="/api/random-number" method="get">
-		<input type="submit" value="Get random number" />
+		<input type="submit" value="Get random number" class="button" />
 	</form>
 	<p>result: {number}</p>
 </div>
