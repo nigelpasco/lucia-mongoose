@@ -6,6 +6,6 @@ export const load: Load = async (event) => {
 	const user = await getUser(event);
 	if (!user) {
 		// authenticated
-		throw redirect(302, '/login');
+		throw redirect(302, '/auth');
 	}
 };
