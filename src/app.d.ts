@@ -9,5 +9,8 @@ declare namespace App {
 }
 
 declare namespace Lucia {
-	interface UserData { }
+	interface UserData {
+		userName: string;
+		email: string;
+	}
 }

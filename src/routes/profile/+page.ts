@@ -1,10 +1,11 @@
 import { redirect } from '@sveltejs/kit';
-import { handleLoad } from 'lucia-sveltekit/load';
-import type { PageLoad } from './$types.js';
+import { getUser } from "lucia-sveltekit/load";
+import type { Load } from "@sveltejs/kit";
 
-export const load: PageLoad = handleLoad(async ({ getSession }) => {
-	console.log("profile")
-	const session = await getSession();
-	if (!session) throw redirect(302, '/login');
-	return {};
-});
+export const load: Load = async (event) => {
+	const user = await getUser(event);
+	if (!user) {
+		// authenticated
+		throw redirect(302, '/login');
+	}
+};

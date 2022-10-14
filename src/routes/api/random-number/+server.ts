@@ -1,4 +1,4 @@
-import { auth } from '$lib/lucia.js';
+import { auth } from '$lib/server/lucia.js';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ request }) => {

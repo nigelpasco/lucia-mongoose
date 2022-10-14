@@ -1,4 +1,4 @@
-import { auth } from '$lib/lucia';
+import { auth } from '$lib/server/lucia';
 import type { Actions } from "@sveltejs/kit";
 import { setCookie } from 'lucia-sveltekit';
 
@@ -16,14 +16,16 @@ export const actions: Actions = {
 			};
 		}
 		try {
-			const createUser = await auth.createUser('email', email, {
+			const user = await auth.createUser('email', email, {
 				password,
-				user_data: {
+				userData: {
 					userName: email,
 					email
 				}
 			});
-			setCookie(cookies, ...createUser.cookies)
+			const { tokens } = await auth.createSession(user.userId);
+			setCookie(cookies, ...tokens.cookies);
+			// setCookie(cookies, ...createUser.cookies)
 			return {
 				location: "/profile"
 			}

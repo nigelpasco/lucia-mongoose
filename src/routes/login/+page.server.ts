@@ -1,9 +1,10 @@
-import type { Actions } from "@sveltejs/kit";
-import { auth } from '$lib/lucia.js';
+import { redirect, type Actions } from "@sveltejs/kit";
+import { auth } from '$lib/server/lucia.js';
 import { setCookie } from "lucia-sveltekit";
 
 export const actions: Actions = {
 	default: async ({ request, cookies }) => {
+		console.log(cookies)
 		const form = await request.formData()
 		const email = form.get("email")
 		const password = form.get("password")
@@ -15,11 +16,13 @@ export const actions: Actions = {
 			};
 		}
 		try {
-			const userSession = await auth.authenticateUser('email', email, password);
-			setCookie(cookies, ...userSession.cookies)
-			return {
-				location: "/profile"
-			}
+			const user = await auth.authenticateUser('email', email, password);
+			const { tokens } = await auth.createSession(user.userId);
+			console.log(tokens)
+			setCookie(cookies, ...tokens.cookies);
+			// return {
+			// 	location: "/profile"
+			// }
 		} catch (e) {
 			const error = e as Error;
 			if (
@@ -41,5 +44,6 @@ export const actions: Actions = {
 				}
 			};
 		}
+		throw redirect(302, "/profile"); // refresh the page by redirecting the user
 	}
 }
