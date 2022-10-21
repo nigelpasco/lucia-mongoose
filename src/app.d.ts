@@ -8,9 +8,19 @@ declare namespace App {
 	// interface PublicEnv {}
 }
 
+// / <reference types="lucia-sveltekit" />
 declare namespace Lucia {
-	interface UserData {
-		userName: string;
-		email: string;
+	type Auth = import("$lib/server/lucia.js").Auth;
+	type UserAttributes = {
+		username: string;
+	};
+}
+
+/// <reference types="@sveltejs/kit" />
+declare namespace App {
+	interface Locals {
+		getSession: import("lucia-sveltekit/types").GetSession;
+		setSession: import("lucia-sveltekit/types").SetSession;
+		clearSession: import("lucia-sveltekit/types").ClearSession;
 	}
 }

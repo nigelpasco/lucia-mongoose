@@ -1,5 +1,5 @@
 import { auth } from '$lib/server/lucia.js';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { generateRandomString } from "lucia-sveltekit";
 
 export const GET: RequestHandler = async ({ request }) => {

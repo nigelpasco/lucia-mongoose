@@ -1,12 +1,26 @@
 <script lang="ts">
-	export let form: any;
+	import { applyAction, enhance } from '$app/forms';
+	import type { ActionData } from './$types';
+	export let form: ActionData;
 	let state: string = 'login';
 </script>
 
 <h2>{state === 'login' ? 'Sign in' : 'Create an Account'}</h2>
-<form method="POST" action="?/login">
-	<label for="email">email</label><br />
-	<input name="email" type="email" value={form?.email ?? ''} /><br />
+<form
+	method="POST"
+	action={state === 'login' ? '?/login' : '?/register'}
+	use:enhance={() => {
+		return async ({ result }) => {
+			if (result.type === 'redirect') {
+				window.location.href = result.location; // invalidateAll() + goto() will not work
+				return;
+			}
+			applyAction(result);
+		};
+	}}
+>
+	<label for="username">email</label><br />
+	<input name="username" type="email" value={form?.username ?? ''} /><br />
 	<label for="password">password</label><br />
 	<input name="password" type="password" /><br />
 	{#if form?.incorrect}<p class="error">Invalid credentials!</p>{/if}

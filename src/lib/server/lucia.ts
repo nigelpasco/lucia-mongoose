@@ -3,27 +3,22 @@ import adapter from '@lucia-sveltekit/adapter-mongoose';
 import mongoose from 'mongoose';
 import { dev } from '$app/environment';
 
-// Pull environment variables
-const url = process.env.MONGODB_URI ? process.env.MONGODB_URI : 'mongodb+srv://<dummy>:<dummy>@cluster0.pnyak.mongodb.net/<dummy>?retryWrites=true&w=majority';
-
 // Set the User Model
 export const User = mongoose.model(
   "user",
-  new mongoose.Schema(
-    {
-      _id: {
-        type: String,
-        default: () => new mongoose.Types.ObjectId().toString()
-      },
-      provider_id: {
-        type: String,
-        unique: true,
-        required: true,
-      },
-      hashed_password: String,
-      email: String,
-      user_name: String
+  new mongoose.Schema({
+    _id: {
+      type: String,
+      default: () => new mongoose.Types.ObjectId().toString()
     },
+    provider_id: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    hashed_password: String,
+    username: String
+  },
     { _id: false }
   )
 );
@@ -32,10 +27,9 @@ export const User = mongoose.model(
 export const Session = mongoose.model(
   "session",
   new mongoose.Schema({
-    access_token: {
+    _id: {
       type: String,
-      unique: true,
-      required: true,
+      default: () => new mongoose.Types.ObjectId().toString()
     },
     user_id: {
       type: String,
@@ -45,27 +39,24 @@ export const Session = mongoose.model(
       type: Number,
       required: true,
     },
-  })
-);
-
-// Set the RefreshToken Model
-export const RefreshToken = mongoose.model(
-  "refresh_token",
-  new mongoose.Schema({
-    refresh_token: {
-      unique: true,
+    idle_expires: {
+      type: Number,
       required: true,
-      type: String,
-    },
-    user_id: {
-      required: true,
-      type: String,
-    },
-  })
+    }
+  },
+    { _id: false })
 );
 
 // Initialise lucia with mongoose adapter
 export const auth = lucia({
-  adapter: adapter(mongoose, url),
-  env: dev ? 'DEV' : 'PROD'
+  adapter: adapter(mongoose),
+  env: dev ? 'DEV' : 'PROD',
+  transformUserData: (userData) => {
+    return {
+      userId: userData.id,
+      username: userData.username,
+    };
+  },
 });
+
+export type Auth = typeof auth

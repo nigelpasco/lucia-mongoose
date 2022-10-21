@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { signOut, getUser, refreshSession } from 'lucia-sveltekit/client';
-	export let form: any;
+	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
+	import { signOut, getUser } from 'lucia-sveltekit/client';
+	import type { ActionData } from './$types';
+	export let form: ActionData;
 	const user = getUser();
 
 	const signOutUser = async () => {
@@ -20,18 +23,6 @@
 		}
 		randomString = result.randomString;
 	};
-
-	const refreshSess = async () => {
-		try {
-			const sess = await refreshSession();
-			console.log('session refreshed');
-		} catch (e) {
-			// error
-			const error = e as Error;
-			console.log('error with refreshing session');
-			console.log(error.message);
-		}
-	};
 </script>
 
 <p>This page is protected and can only be accessed by authenticated users.</p>
@@ -41,12 +32,22 @@
 <p>The details below are from the lucia getUser API call.</p>
 <div>
 	<p>user id: {user?.userId}</p>
-	<p>username: {user?.userName}</p>
+	<p>username: {user?.username}</p>
 </div>
 <hr />
 
-<h4>The below uses lucia's generateRandomString() API to generate a crytpographically string.</h4>
 <div>
+	<h2>Notes</h2>
+	<h4>The below updates the Notes session cookie</h4>
+	<form method="post" action="?/updateNote" use:enhance>
+		<input value={$page.data.notes} name="notes" />
+		<input type="submit" value="Save" class="button" />
+	</form>
+</div>
+
+<div>
+	<h2>Random String</h2>
+	<h4>The below uses lucia's generateRandomString() API to generate a crytpographically string.</h4>
 	<form on:submit|preventDefault={fetchString} method="GET">
 		<input type="submit" value="Get random string" class="button" />
 	</form>
@@ -54,23 +55,19 @@
 </div>
 <hr />
 
-<h4>The below button refreshes the session with the refreshSession API call.</h4>
-<button on:click={refreshSess}>Refresh Session</button>
-<hr />
+<button on:click={() => signOut('/auth')}>Sign out</button>
 
 <h4>Update User Name</h4>
 <form method="POST" action="?/updateUser">
-	<label for="userName">New User Name</label><br />
-	<input name="userName" type="text" value={form?.userName ?? ''} /><br />
-	<input name="userId" type="hidden" value={user?.userId} />
+	<label for="username">New User Name</label><br />
+	<input name="username" type="text" value={form?.username ?? ''} />
 	<button>Change My User Name</button>
 </form>
 
 <h4>Update Password</h4>
 <form method="POST" action="?/updatePassword">
 	<label for="password">new password</label><br />
-	<input name="password" type="password" value={form?.password ?? ''} /><br />
-	<input name="userId" type="hidden" value={user?.userId} />
+	<input name="password" type="password" value={form?.password ?? ''} />
 	<button>Change My Password Please</button>
 </form>
 <hr />
@@ -81,7 +78,6 @@
 
 <h4>Delete User</h4>
 <form method="POST" action="?/deleteUser">
-	<input name="userId" type="hidden" value={user?.userId} />
 	<button>Delete User</button>
 </form>
 <i>WARNING: This will delete your account and can not be undone!</i>
