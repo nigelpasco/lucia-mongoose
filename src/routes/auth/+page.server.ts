@@ -1,5 +1,13 @@
-import { invalid, redirect, type Actions } from "@sveltejs/kit";
+import { invalid, redirect } from "@sveltejs/kit";
 import { auth } from "$lib/server/lucia";
+import type { PageServerLoad, Actions } from "./$types";
+import { LuciaError } from "lucia-auth";
+
+export const load: PageServerLoad = async ({ locals }) => {
+	const session = await locals.getSession();
+	if (session) throw redirect(302, '/profile');
+	return {};
+};
 
 export const actions: Actions = {
 	login: async ({ request, locals }) => {
@@ -13,7 +21,9 @@ export const actions: Actions = {
 			typeof username !== "string" ||
 			typeof password !== "string"
 		)
-			return invalid(400);
+			return invalid(400, {
+				message: 'Invalid input'
+			});
 		try {
 			const user = await auth.authenticateUser(
 				"username",
@@ -23,26 +33,28 @@ export const actions: Actions = {
 			const session = await auth.createSession(user.userId);
 			locals.setSession(session);
 		} catch (e) {
+			if (e instanceof LuciaError) {
+				const message = e.message;
+				return invalid(400, {
+					message
+				});
+			}
 			const error = e as Error;
 			if (
 				error.message === 'AUTH_INVALID_PROVIDER_ID' ||
 				error.message === 'AUTH_INVALID_PASSWORD' ||
 				error.message === 'AUTH_OUTDATED_PASSWORD'
 			) {
-				return invalid(400, { username, incorrect: true });
+				return invalid(400, {
+					message: 'Incorrect username or password.'
+				});
 			}
-
-			if (
-				error.message === 'DATABASE_FETCH_FAILED'
-			) {
-				return invalid(400, { username, failed: true });
-			}
-
 			// otherwise assume a database connection error
 			console.error(error)
-			return invalid(400, { username, failed: true });
+			return invalid(500, {
+				message: 'Unknown error occurred'
+			});
 		}
-		throw redirect(302, "/profile"); // refresh the page by redirecting the user
 	},
 	register: async ({ request, locals }) => {
 		const form = await request.formData();
@@ -55,7 +67,9 @@ export const actions: Actions = {
 			typeof username !== "string" ||
 			typeof password !== "string"
 		)
-			return invalid(400);
+			return invalid(400, {
+				message: 'Invalid input'
+			});
 		try {
 			const user = await auth.createUser("username", username, {
 				password,
@@ -66,24 +80,26 @@ export const actions: Actions = {
 			const session = await auth.createSession(user.userId);
 			locals.setSession(session);
 		} catch (e) {
+			if (e instanceof LuciaError) {
+				const message = e.message;
+				return invalid(400, {
+					message
+				});
+			}
 			const error = e as Error;
 			if (
 				error.message === 'AUTH_DUPLICATE_PROVIDER_ID' ||
 				error.message === 'AUTH_DUPLICATE_USER_DATA'
 			) {
-				return invalid(400, { username, incorrect: true });
+				return invalid(400, {
+					message: 'Incorrect username or password.'
+				});
 			}
-
-			if (
-				error.message === 'DATABASE_UPDATE_FAILED'
-			) {
-				return invalid(400, { username, failed: true });
-			}
-
 			// otherwise assume a database connection error
 			console.error(error)
-			return invalid(400, { username, failed: true });
+			return invalid(500, {
+				message: 'Unknown error occurred'
+			});
 		}
-		throw redirect(302, "/profile");
 	},
 };

@@ -1,16 +1,10 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 // and what to do when importing types
-declare namespace App {
-	// interface Locals {}
-	// interface Platform {}
-	// interface PrivateEnv {}
-	// interface PublicEnv {}
-}
 
-// / <reference types="lucia-sveltekit" />
+/// <reference types="lucia-auth" />
 declare namespace Lucia {
-	type Auth = import("$lib/server/lucia.js").Auth;
+	type Auth = import("$lib/server/lucia").Auth;
 	type UserAttributes = {
 		username: string;
 	};
@@ -19,8 +13,11 @@ declare namespace Lucia {
 /// <reference types="@sveltejs/kit" />
 declare namespace App {
 	interface Locals {
-		getSession: import("lucia-sveltekit/types").GetSession;
-		setSession: import("lucia-sveltekit/types").SetSession;
-		clearSession: import("lucia-sveltekit/types").ClearSession;
+		getSession: import("@lucia-auth/sveltekit").GetSession;
+		getSessionUser: import("@lucia-auth/sveltekit").GetSessionUser;
+		setSession: import("@lucia-auth/sveltekit").SetSession;
 	}
+	// interface Platform {}
+	// interface PrivateEnv {}
+	// interface PublicEnv {}
 }

@@ -1,6 +1,6 @@
-import lucia from "lucia-sveltekit";
-import adapter from '@lucia-sveltekit/adapter-mongoose';
-import mongoose from 'mongoose';
+import lucia from "lucia-auth";
+import adapter from "@lucia-auth/adapter-mongoose";
+import mongoose from "mongoose";
 import { dev } from '$app/environment';
 
 // Set the User Model
@@ -17,7 +17,10 @@ export const User = mongoose.model(
       required: true,
     },
     hashed_password: String,
-    username: String
+    username: {
+      type: String,
+      unique: true
+    }
   },
     { _id: false }
   )
@@ -51,6 +54,7 @@ export const Session = mongoose.model(
 export const auth = lucia({
   adapter: adapter(mongoose),
   env: dev ? 'DEV' : 'PROD',
+  sessionTimeout: 1000 * 5,
   transformUserData: (userData) => {
     return {
       userId: userData.id,

@@ -1,30 +1,33 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms';
-	import type { ActionData } from './$types';
-	export let form: ActionData;
+	import { enhance } from '$app/forms';
+	export let form: { message?: string };
+	// import type { ActionData } from './$types';
+	// export let form: ActionData;
 	let state: string = 'login';
 </script>
 
 <h2>{state === 'login' ? 'Sign in' : 'Create an Account'}</h2>
+
 <form
 	method="POST"
 	action={state === 'login' ? '?/login' : '?/register'}
-	use:enhance={() => {
-		return async ({ result }) => {
-			if (result.type === 'redirect') {
-				window.location.href = result.location; // invalidateAll() + goto() will not work
-				return;
-			}
-			applyAction(result);
-		};
+	use:enhance={({ data, cancel }) => {
+		form = {};
+		const username = data.get('username')?.toString() || '';
+		const password = data.get('password')?.toString() || '';
+		if (!username || !password) {
+			form.message = 'Invalid input';
+			cancel();
+		}
 	}}
 >
 	<label for="username">email</label><br />
-	<input name="username" type="email" value={form?.username ?? ''} /><br />
+	<input name="username" type="email" /><br />
 	<label for="password">password</label><br />
 	<input name="password" type="password" /><br />
-	{#if form?.incorrect}<p class="error">Invalid credentials!</p>{/if}
-	{#if form?.failed}<p class="error">Database Failed!</p>{/if}
+	<!-- {#if form?.incorrect}<p class="error">Invalid credentials!</p>{/if} -->
+	<!-- {#if form?.failed}<p class="error">Database Failed!</p>{/if} -->
+	<p class="error">{form?.message || ''}</p>
 	{#if state === 'login'}<button class="button">Log in</button>
 	{:else}
 		<button class="button" formaction="?/register">Register</button>{/if}

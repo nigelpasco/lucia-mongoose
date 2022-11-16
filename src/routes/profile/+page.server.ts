@@ -4,7 +4,7 @@ import { invalid, redirect, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ cookies, locals }) => {
-	const session = locals.getSession();
+	const session = await locals.getSession();
 	if (!session) throw redirect(302, "/auth");
 	const notes = cookies.get("notes") || "";
 	return {
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 
 export const actions: Actions = {
 	updateNote: async ({ cookies, request, locals }) => {
-		const session = locals.getSession();
+		const session = await locals.getSession();
 		if (!session) return invalid(403);
 		const formData = await request.formData();
 		const notes = formData.get("notes")?.toString();
@@ -26,8 +26,7 @@ export const actions: Actions = {
 		});
 	},
 	updateUser: async ({ request, locals }) => {
-		const session = locals.getSession();
-		console.log(session)
+		const session = await locals.getSession();
 		if (!session) return invalid(403);
 		const data = await request.formData()
 		const username = data.get("username")
@@ -36,7 +35,7 @@ export const actions: Actions = {
 			await auth.updateUserAttributes(session.userId, {
 				// phoneNumber: "000-0000-0000",
 				// profilePicture: null,
-				username
+				username: username
 			});
 		} catch (e) {
 			const error = e as Error;
@@ -59,13 +58,14 @@ export const actions: Actions = {
 		throw redirect(302, "/profile"); // refresh the page to refresh userData, cookies etc.
 	},
 	updatePassword: async ({ request, locals }) => {
-		const session = locals.getSession();
+		const session = await locals.getSession();
 		if (!session) return invalid(403);
 		const data = await request.formData()
 		const password = data.get("password")
 
 		try {
 			await auth.updateUserPassword(session.userId, password);
+			// return { success: true };
 		} catch (e) {
 			const error = e as Error;
 			if (
@@ -84,10 +84,10 @@ export const actions: Actions = {
 			console.error(error)
 			return invalid(400, { password, failed: true });
 		}
-		throw redirect(302, "/profile"); // refresh the page to refresh userData, cookies etc.
+		throw redirect(302, "/auth"); // need to redirect as the userPassword function seems to delete the session also.
 	},
 	deleteUser: async ({ locals }) => {
-		const session = locals.getSession();
+		const session = await locals.getSession();
 		if (!session) return invalid(403);
 
 		try {

@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { signOut, getUser } from 'lucia-sveltekit/client';
+	import { signOut, getUser } from '@lucia-auth/sveltekit/client';
+	import { invalidateAll } from '$app/navigation';
 	import type { ActionData } from './$types';
 	export let form: ActionData;
 	const user = getUser();
 
 	const signOutUser = async () => {
-		await signOut('/');
+		await signOut();
+		invalidateAll();
 	};
 
 	let randomString = '';
@@ -31,8 +33,8 @@
 <h2>Profile</h2>
 <p>The details below are from the lucia getUser API call.</p>
 <div>
-	<p>user id: {user?.userId}</p>
-	<p>username: {user?.username}</p>
+	<p>user id: {$user?.userId}</p>
+	<p>username: {$user?.username}</p>
 </div>
 <hr />
 
@@ -55,8 +57,6 @@
 </div>
 <hr />
 
-<button on:click={() => signOut('/auth')}>Sign out</button>
-
 <h4>Update User Name</h4>
 <form method="POST" action="?/updateUser">
 	<label for="username">New User Name</label><br />
@@ -70,6 +70,9 @@
 	<input name="password" type="password" value={form?.password ?? ''} />
 	<button>Change My Password Please</button>
 </form>
+{#if form?.success}
+	<p>Password successfully changed</p>
+{/if}
 <hr />
 
 <h4>The below button signs user out with the signOut API call.</h4>
